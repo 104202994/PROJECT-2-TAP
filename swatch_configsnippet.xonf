@@ -1,0 +1,3 @@
+watchfor /<script>.*<\/script>/
+    exec echo "XSS attack detected: $_" | mail -s "XSS Alert" your-email@example.com
+    threshold type=limit,count=1,seconds=300
