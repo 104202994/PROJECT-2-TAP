@@ -84,7 +84,7 @@ def block_ip(ip_address):
     print(f"{ip_address} is blocked.")
 
 def send_slack_alert(ip_address, alert_type):
-    webhook_url = 'https://hooks.slack.com/services/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'
+    webhook_url = 'WEbhook'
     message = {
         'text': f"Alert! {alert_type} from {ip_address}."
     }
