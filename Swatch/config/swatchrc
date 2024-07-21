@@ -1,0 +1,4 @@
+# Monitor for brute force attacks
+watchfor /\/DVWA\/vulnerabilities\/brute\/\?username=admin&password=/i
+    exec "python3 /home/nil/Desktop/Swatch/scripts/detect_bruteforce.py"
+
