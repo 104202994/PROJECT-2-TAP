@@ -1,0 +1,4 @@
+192.168.1.1 - - [21/Jul/2024:12:34:56 +0000] "GET /login HTTP/1.1" 200 1234 "http://mtaammasklogin.gitbook.io/us" "Mozilla/5.0"
+192.168.1.2 - - [21/Jul/2024:12:35:12 +0000] "GET /home HTTP/1.1" 200 5678 "http://example.com" "Mozilla/5.0"
+192.168.1.3 - - [21/Jul/2024:12:35:45 +0000] "GET /checkout HTTP/1.1" 200 91011 "http://bagi-hadiah-d4na-id7.t-5.my.id/" "Mozilla/5.0"
+192.168.1.4 - - [21/Jul/2024:12:36:22 +0000] "GET /profile HTTP/1.1" 200 1234 "http://another-legitimate-site.com" "Mozilla/5.0"
