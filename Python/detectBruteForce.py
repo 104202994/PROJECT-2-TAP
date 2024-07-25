@@ -6,6 +6,7 @@ from slack_alert import send_slack_notification
 
 # Path to the Apache access log file
 LOG_FILE_PATH = '/opt/lampp/logs/access_log'
+name="Brute Force attack"
 
 # Thresholds
 ATTEMPT_THRESHOLD = 5
@@ -30,7 +31,7 @@ def block_ip_address(ip_address):
     try:
         subprocess.run(['sudo', 'iptables', '-A', 'INPUT', '-s', ip_address, '-j', 'DROP'], check=True)
         print(f"IP address {ip_address} has been blocked.")
-        send_slack_notification(ip_address)
+        send_slack_notification(ip_address, name)
     except subprocess.CalledProcessError as e:
         print(f"Failed to block IP address {ip_address}: {e}")
 
