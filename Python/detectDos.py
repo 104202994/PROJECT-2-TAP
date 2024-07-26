@@ -31,7 +31,7 @@ def block_ip_address(ip_address):
     try:
         subprocess.run(['sudo', 'iptables', '-A', 'INPUT', '-s', ip_address, '-j', 'DROP'], check=True)
         print(f"IP address {ip_address} has been blocked.")
-        send_slack_notification(ip_address, name)
+        send_slack_notification(ip_address, name, "")
     except subprocess.CalledProcessError as e:
         print(f"Failed to block IP address {ip_address}: {e}")
 
