@@ -51,7 +51,7 @@ def check_for_dos(ip_address, endpoint):
         if ip_address not in last_alert_time or current_time - last_alert_time[ip_address] > COOLDOWN_PERIOD:
             last_alert_time[ip_address] = current_time
             request_count = len(request_counts[key])
-            print(f"Alert! Potential DoS attack from IP address {ip_address}. Count: {request_count}")
+            print(f"Alert! Potential DoS attack from IP address {ip_address}. Count: {request_count}", flush=True)
             block_ip_address(ip_address)
             return True
     return False
