@@ -4,6 +4,7 @@ import subprocess
 import sys
 import pickle
 from collections import defaultdict
+from datetime import datetime, timedelta
 
 # Define your API key and endpoint
 api_key = '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'
@@ -39,14 +40,21 @@ def send_email():
 
 # Threshold for blocking IPs
 threshold = 5
+attempts_reset_time = 30  # in seconds
+block_duration = 300  # in seconds (5 minutes)
 attempts_file = "/var/tmp/attempts.pkl"
 
 def load_attempts():
     try:
         with open(attempts_file, "rb") as f:
-            return pickle.load(f)
+            attempts = pickle.load(f)
+            # Ensure the loaded data structure is as expected
+            for ip, data in attempts.items():
+                if not isinstance(data, dict) or 'count' not in data or 'last_attempt' not in data:
+                    attempts[ip] = {'count': 0, 'last_attempt': datetime.min}
+            return attempts
     except FileNotFoundError:
-        return defaultdict(int)
+        return defaultdict(lambda: {'count': 0, 'last_attempt': datetime.min})
 
 def save_attempts(attempts):
     with open(attempts_file, "wb") as f:
@@ -62,18 +70,39 @@ def block_ip(ip):
 def handle_ip(ip):
     attempts = load_attempts()
     print(f"Handling IP: {ip}")
-    attempts[ip] += 1
-    print(f"Attempts for {ip}: {attempts[ip]}")
+    
+    current_time = datetime.now()
+    last_attempt = attempts[ip]['last_attempt']
+    
+    if (current_time - last_attempt).seconds > attempts_reset_time:
+        attempts[ip]['count'] = 0
+    
+    attempts[ip]['count'] += 1
+    attempts[ip]['last_attempt'] = current_time
+    
+    print(f"Attempts for {ip}: {attempts[ip]['count']}")
     save_attempts(attempts)
-    if attempts[ip] >= threshold:
+    
+    if attempts[ip]['count'] >= threshold:
         send_email()
         block_ip(ip)
+        attempts[ip]['count'] = 0  # Reset count after blocking
+        save_attempts(attempts)
+
+        # Schedule unblocking the IP after block_duration
+        unblock_time = current_time + timedelta(seconds=block_duration)
+        unblock_command = f"sudo /usr/bin/python3 /usr/local/bin/unblock_ip.py {ip}"
+        subprocess.run(["at", unblock_time.strftime('%H:%M')], input=unblock_command, text=True)
 
 if __name__ == "__main__":
     print(f"Arguments received: {sys.argv}")
-    if len(sys.argv) != 2:
-        print("Usage: python send_swatch_email.py <ip_address>")
+    if len(sys.argv) < 2:
+        print("Usage: python send_swatch_email.py <log_line>")
         sys.exit(1)
 
-    ip = sys.argv[1]
+    log_line = ' '.join(sys.argv[1:])
+    print(f"Log line: {log_line}")
+    
+    # Extract the IP address from the log line
+    ip = log_line.split(' ')[0]
     handle_ip(ip)
