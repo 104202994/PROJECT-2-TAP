@@ -5,6 +5,7 @@ import sys
 import pickle
 from collections import defaultdict
 from datetime import datetime, timedelta
+import os
 
 # Define your API key and endpoint
 api_key = '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'
@@ -67,6 +68,24 @@ def block_ip(ip):
     except subprocess.CalledProcessError as e:
         print(f"Failed to block IP {ip}: {e}")
 
+def restart_web_server():
+    try:
+        subprocess.run(["sudo", "systemctl", "restart", "apache2"], check=True)
+        print("Web server restarted successfully, resetting DVWA security level to 'impossible'.")
+    except subprocess.CalledProcessError as e:
+        print(f"Failed to restart web server: {e}")
+
+def invalidate_sessions():
+    session_path = "/var/lib/php/sessions"
+    try:
+        for session_file in os.listdir(session_path):
+            file_path = os.path.join(session_path, session_file)
+            if os.path.isfile(file_path):
+                os.remove(file_path)
+        print("Invalidated all sessions.")
+    except Exception as e:
+        print(f"Failed to invalidate sessions: {e}")
+
 def handle_ip(ip):
     attempts = load_attempts()
     print(f"Handling IP: {ip}")
@@ -88,6 +107,10 @@ def handle_ip(ip):
         block_ip(ip)
         attempts[ip]['count'] = 0  # Reset count after blocking
         save_attempts(attempts)
+        
+        # Invalidate sessions and restart the web server
+        invalidate_sessions()
+        restart_web_server()
 
         # Schedule unblocking the IP after block_duration
         unblock_time = current_time + timedelta(seconds=block_duration)
