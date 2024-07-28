@@ -66,7 +66,7 @@ def monitor_log_file():
                 if is_brute_force(ip_address, current_time):
                     last_alert = last_alert_time.get(ip_address, 0)
                     if current_time - last_alert > COOLDOWN_PERIOD:
-                        print(f"Alert! Potential Brute force attack from IP address {ip_address}.")
+                        print(f"Alert! Potential Brute force attack from IP address {ip_address}.", flush=True)
                         block_ip_address(ip_address)
                         last_alert_time[ip_address] = current_time
 
