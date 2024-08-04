@@ -1,11 +1,11 @@
 import requests
 
-SLACK_WEBHOOK_URL = 'https://hooks.slack.com/services'
+SLACK_WEBHOOK_URL = 'https://hooks.slack.com/services/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'
 
 def send_slack_notification(ip_address, name, attack_details):
     """Send a notification to a Slack channel using the webhook URL."""
     message = {
-        "text": f"Alert! Potential {name} detected.\n```IP address {ip_address} has been blocked.\n{attack_details}```"
+        "text": f"Alert! Potential {name} detected.\n\n```IP address {ip_address} has been blocked.\n{attack_details}```"
     }
     try:
         response = requests.post(SLACK_WEBHOOK_URL, json=message)
