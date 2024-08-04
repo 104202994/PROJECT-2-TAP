@@ -14,7 +14,7 @@ name_lfi = "Local File Inclusion"
 rfi_pattern = re.compile(r'(http|https|ftp)://', re.IGNORECASE)
 
 # Allowed files for local file inclusion
-allowed_files = {'include.php', 'file1.php', 'file2.php', 'file3.php'}
+allowed_files = {'include.php', 'file1.php', 'file2.php', 'file3.php', '../'}
 
 def detect_rfi(line):
     """Detect Remote File Inclusion (RFI) attempts in the log line."""
@@ -38,6 +38,11 @@ def detect_lfi(line):
     lfi_match = re.search(r'/DVWA/vulnerabilities/fi/\?page=([^& ]+)', line)
     if lfi_match:
         file_name = lfi_match.group(1)
+        # Check if the path starts with '../'
+        if file_name.startswith('../'):
+            print(f"Excluded LFI attempt: {file_name} (starts with '../')", flush=True)
+            return None, None
+        
         if file_name not in allowed_files:
             ip_match = re.match(r'(\d+\.\d+\.\d+\.\d+)', line)
             if ip_match:
