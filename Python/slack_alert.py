@@ -1,6 +1,6 @@
 import requests
 
-SLACK_WEBHOOK_URL = 'https://hooks.slack.com/services/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'
+SLACK_WEBHOOK_URL = 'https://hooks.slack.com/services'
 
 def send_slack_notification(ip_address, name, attack_details):
     """Send a notification to a Slack channel using the webhook URL."""
