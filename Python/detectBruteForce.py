@@ -6,7 +6,7 @@ from slack_alert import send_slack_notification
 
 # Path to the Apache access log file
 LOG_FILE_PATH = '/opt/lampp/logs/access_log'
-name="Brute Force attack"
+name = "Brute Force attack"
 
 # Thresholds
 ATTEMPT_THRESHOLD = 5
@@ -19,12 +19,16 @@ request_counts = defaultdict(list)
 last_alert_time = defaultdict(lambda: 0)
 
 def parse_log_line(line):
-    """ Parse a log line and return the IP address if valid. """
-    match = re.match(r'(\d+\.\d+\.\d+\.\d+) - - \[.*?\] "GET /DVWA/vulnerabilities/brute/\?username=[^&]+&password=[^&]+&Login=Login HTTP/1.1" \d+ \d+', line)
+    """ Parse a log line and return the IP address and status (success/failure). """
+    # Example of a successful login might return 4335 bytes, so we capture that as well
+    match = re.match(r'(\d+\.\d+\.\d+\.\d+) - - \[.*?\] "GET /DVWA/vulnerabilities/brute/\?username=[^&]+&password=[^&]+&Login=Login HTTP/1.1" \d+ (\d+)', line)
     if match:
         ip_address = match.group(1)
-        return ip_address
-    return None
+        response_size = int(match.group(2))  # Capture the response size
+        # Determine if the attempt was successful based on the response size
+        success = response_size > 4300  # Adjust the size threshold based on what your logs show for success
+        return ip_address, success
+    return None, False
 
 def block_ip_address(ip_address):
     """ Block the IP address using iptables. """
@@ -55,9 +59,9 @@ def monitor_log_file():
                 time.sleep(0.1)
                 continue
             
-            ip_address = parse_log_line(line)
+            ip_address, success = parse_log_line(line)
             
-            if ip_address:
+            if ip_address and not success:  # Only count failed attempts
                 current_time = time.time()
                 
                 # Add current timestamp to the list of requests for the IP address
