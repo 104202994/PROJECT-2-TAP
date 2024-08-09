@@ -20,12 +20,10 @@ last_alert_time = defaultdict(lambda: 0)
 
 def parse_log_line(line):
     """ Parse a log line and return the IP address and status (success/failure). """
-    # Example of a successful login might return 4335 bytes, so we capture that as well
     match = re.match(r'(\d+\.\d+\.\d+\.\d+) - - \[.*?\] "GET /DVWA/vulnerabilities/brute/\?username=[^&]+&password=[^&]+&Login=Login HTTP/1.1" \d+ (\d+)', line)
     if match:
         ip_address = match.group(1)
         response_size = int(match.group(2))  # Capture the response size
-        # Determine if the attempt was successful based on the response size
         success = response_size > 4300  # Adjust the size threshold based on what your logs show for success
         return ip_address, success
     return None, False
@@ -39,11 +37,26 @@ def block_ip_address(ip_address):
     except subprocess.CalledProcessError as e:
         print(f"Failed to block IP address {ip_address}: {e}")
 
-def is_brute_force(ip_address, current_time):
-    """ Check if the IP address is performing a brute force attack. """
-    attempts = [timestamp for timestamp in request_counts[ip_address] if current_time - timestamp <= TIMEFRAME]
-    if len(attempts) > ATTEMPT_THRESHOLD:
-        return True
+def check_for_brute_force(ip_address, success):
+    """ Check if the IP address is performing a brute force attack, and block if necessary. """
+    if success:
+        return False  # Skip successful attempts
+
+    current_time = time.time()
+    
+    # Clean up old timestamps
+    request_counts[ip_address] = [timestamp for timestamp in request_counts[ip_address] if current_time - timestamp <= TIMEFRAME]
+    
+    # Add new request timestamp
+    request_counts[ip_address].append(current_time)
+    
+    # Check if the request count exceeds the threshold and cooldown period has passed
+    if len(request_counts[ip_address]) > ATTEMPT_THRESHOLD:
+        if current_time - last_alert_time[ip_address] > COOLDOWN_PERIOD:
+            last_alert_time[ip_address] = current_time
+            print(f"Alert! Potential Brute force attack from IP address {ip_address}.", flush=True)
+            block_ip_address(ip_address)
+            return True
     return False
 
 def monitor_log_file():
@@ -60,19 +73,9 @@ def monitor_log_file():
                 continue
             
             ip_address, success = parse_log_line(line)
-            
-            if ip_address and not success:  # Only count failed attempts
-                current_time = time.time()
-                
-                # Add current timestamp to the list of requests for the IP address
-                request_counts[ip_address].append(current_time)
-                
-                if is_brute_force(ip_address, current_time):
-                    last_alert = last_alert_time.get(ip_address, 0)
-                    if current_time - last_alert > COOLDOWN_PERIOD:
-                        print(f"Alert! Potential Brute force attack from IP address {ip_address}.", flush=True)
-                        block_ip_address(ip_address)
-                        last_alert_time[ip_address] = current_time
+            if ip_address:
+                if check_for_brute_force(ip_address, success):
+                    pass
 
 if __name__ == "__main__":
     monitor_log_file()
