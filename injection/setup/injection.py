@@ -37,6 +37,8 @@ def detect_injection_attacks(ip_address, method, url, query_string):
         handle_alert("NoSQL Injection detected", ip_address, method, url, query_string)
     elif detect_ssrf(url):
         handle_alert("SSRF detected", ip_address, method, url, query_string)
+    elif detect_xss(url, query_string):
+        handle_alert("XSS detected", ip_address, method, url, query_string)
 
 # Function to detect Command Injection attempts
 def detect_command_injection(url, query_string):
@@ -53,6 +55,11 @@ def detect_nosql_injection(query_string):
 # Function to detect SSRF attempts
 def detect_ssrf(url):
     return '127.0.0.1' in url or 'localhost' in url or '169.254.' in url
+
+# Function to detect XSS attempts
+def detect_xss(url, query_string):
+    xss_patterns = ['<script', '</script', 'onload=', 'onerror=', 'alert(', 'document.cookie']
+    return any(keyword in url.lower() or keyword in query_string.lower() for keyword in xss_patterns)
 
 # Function to handle alerts
 def handle_alert(alert_message, ip_address, method, url, query_string):
