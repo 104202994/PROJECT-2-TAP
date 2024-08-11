@@ -3,26 +3,39 @@ import subprocess
 
 def revert_security(folder_name):
     """Revert changes in index.php files to use {$vulnerabilityFile}."""
-    file_path = f'/opt/lampp/htdocs/DVWA/vulnerabilities/{folder_name}/index.php'
+    # Construct the file path
+    file_path = f"/opt/lampp/htdocs/DVWA/vulnerabilities/{folder_name}/index.php"
     
-    if not os.path.isfile(file_path):
+    # Check if the file exists
+    if not os.path.exists(file_path):
         print(f"File not found: {file_path}")
         return
+
+    # The line to search for with "impossible.php"
+    search_line = f'require_once DVWA_WEB_PAGE_TO_ROOT . "vulnerabilities/{folder_name}/source/impossible.php";'
+    replacement_line = f'require_once DVWA_WEB_PAGE_TO_ROOT . "vulnerabilities/{folder_name}/source/{{$vulnerabilityFile}}";'
     
-    try:
-        with open(file_path, 'r') as file:
-            lines = file.readlines()
-        
+    # Read the file
+    with open(file_path, 'r') as file:
+        lines = file.readlines()
+
+    # Flag to check if the line was found and replaced
+    found = False
+
+    # Iterate over each line to find and replace the matching line
+    for i, line in enumerate(lines):
+        if search_line in line:
+            lines[i] = line.replace('impossible.php', '{$vulnerabilityFile}')
+            found = True
+            print(f"Line found and reverted in {file_path} at line {i+1}")
+            break
+
+    # If the line was found and replaced, write back the modified content to the file
+    if found:
         with open(file_path, 'w') as file:
-            for line in lines:
-                if "require_once DVWA_WEB_PAGE_TO_ROOT . 'vulnerabilities/{folder_name}/source/impossible.php';" in line:
-                    line = line.replace("impossible.php", "{$vulnerabilityFile}")
-                file.write(line)
-        
-        print(f"Reverted {file_path} to use {{$vulnerabilityFile}}")
-    
-    except Exception as e:
-        print(f"Error processing {file_path}: {e}")
+            file.writelines(lines)
+    else:
+        print(f"Line not found in {file_path}")
 
 def update_php_ini():
     """Update php.ini to set allow_url_include to On."""
