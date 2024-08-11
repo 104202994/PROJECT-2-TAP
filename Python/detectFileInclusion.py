@@ -2,6 +2,7 @@ import time
 import re
 import subprocess
 from slack_alert import send_slack_notification
+from upgrade_security import upgrade_security
 
 # Path to the Apache access log file
 LOG_FILE_PATH = '/opt/lampp/logs/access_log'
@@ -9,6 +10,7 @@ PHP_INI_PATH = '/opt/lampp/etc/php.ini'
 name = "File Inclusion"
 name_rfi = "Remote File Inclusion"
 name_lfi = "Local File Inclusion"
+folder_name = "fi"
 
 # Regular expression pattern for remote file inclusion
 rfi_pattern = re.compile(r'(http|https|ftp)://', re.IGNORECASE)
@@ -52,6 +54,7 @@ def detect_lfi(line):
                 alert_message = f"Alert! Potential File Inclusion detected from IP address {ip_address}\n{attack_details}"
                 print(alert_message, flush=True)
                 send_slack_notification(ip_address, name, attack_details)
+                upgrade_security(folder_name)
                 return ip_address, attack_details
     return None, None
 
