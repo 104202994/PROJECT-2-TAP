@@ -39,6 +39,8 @@ def detect_execution_attacks(ip_address, url, query_string):
         handle_alert("Privilege Escalation Attempt detected", ip_address, url)
     elif detect_unauthorized_script_execution(url):
         handle_alert("Unauthorized Script Execution detected", ip_address, url)
+    elif detect_command_injection(query_string):
+        handle_alert("Command Injection detected", ip_address, url)
 
 # Function to detect RCE via Deserialization attempts
 def detect_rce_deserialization(query_string):
@@ -55,6 +57,11 @@ def detect_privilege_escalation(url):
 # Function to detect Unauthorized Script Execution attempts
 def detect_unauthorized_script_execution(url):
     return '.sh' in url or '.php' in url
+
+# Function to detect Command Injection attempts
+def detect_command_injection(query_string):
+    command_patterns = ['ls', 'cd', 'sudo', 'cat', 'rm', 'mv', 'cp', 'wget', 'curl']
+    return any(command in query_string for command in command_patterns)
 
 # Function to handle alerts
 def handle_alert(alert_message, ip_address, url):
