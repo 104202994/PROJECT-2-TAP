@@ -72,7 +72,7 @@ wait $pid_phishing_swatch
 echo "Python scripts and Swatch monitoring completed for all attack types."
 
 # Add cron job if it does not already exist
-CRON_JOB="0 * * * * /path/to/run_swatch_and_python.sh"
+CRON_JOB="0 * * * * /path/to/automation.sh"
 
 # Check if the cron job already exists
 CRON_JOB_EXISTS=$(crontab -l | grep -F "$CRON_JOB")
