@@ -32,5 +32,4 @@ This project focuses on detecting and responding to three specific cyber threats
 
 1. **Clone the Repository:**
    ```bash
-   git clone https://github.com/yourusername/cybersecurity-monitoring.git
-   cd cybersecurity-monitoring
+   git https://github.com/104202994/PROJECT-2-TAP/edit/Abhash/README.md
