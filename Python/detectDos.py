@@ -20,7 +20,7 @@ last_alert_time = {}
 
 def parse_log_line(line):
     """ Parse a log line and return the IP address, HTTP method, and endpoint if valid. """
-    match = re.match(r'(\d+\.\d+\.\d+\.\d+) - - \[.*?\] "(GET|POST|PUT|DELETE|HEAD|OPTIONS) (.+?) HTTP/1.1" \d+ \d+', line)
+    match = re.match(r'(\d+\.\d+\.\d+\.\d+) - - \[.*?\] "(GET|POST|PUT|DELETE|HEAD|OPTIONS) (.+?) HTTP/1.1" \d+', line)
     if match:
         ip_address, http_method, endpoint = match.groups()
         return ip_address, endpoint  # Only return the IP address and endpoint
