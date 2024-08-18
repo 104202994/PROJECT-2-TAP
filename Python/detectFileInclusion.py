@@ -44,6 +44,9 @@ def detect_lfi(line):
         if file_name.startswith('../'):
             print(f"Excluded LFI attempt: {file_name} (starts with '../')", flush=True)
             return None, None
+        if file_name.startswith('%'):
+            print(f"Excluded LFI attempt: {file_name} (starts with '%')", flush=True)
+            return None, None
         
         if file_name not in allowed_files:
             ip_match = re.match(r'(\d+\.\d+\.\d+\.\d+)', line)
