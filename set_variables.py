@@ -25,6 +25,11 @@ def update_files(log_file_path, regex_pattern):
         with open(setup_file_path, 'w') as file:
             file.writelines(lines)
 
+    # Save the log file path to a temporary file for the bash script to read
+    temp_file_path = "/tmp/log_file_path.txt"
+    with open(temp_file_path, "w") as temp_file:
+        temp_file.write(log_file_path)
+
     messagebox.showinfo("Success", "Setup files have been updated successfully!")
 
 # Function to open the file dialog for selecting the log file
