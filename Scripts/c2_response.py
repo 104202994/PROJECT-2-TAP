@@ -10,7 +10,7 @@ import re
 logging.basicConfig(filename='/var/log/c2_response.log', level=logging.INFO, format='%(asctime)s %(message)s')
 
 # Email alert configuration
-api_key = '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'
+api_key = 'apikey'
 endpoint = 'https://api.brevo.com/v3/smtp/email'
 email_data = {
     "sender": {"name": "Security Alert", "email": "tapmonitor2024@gmail.com"},
