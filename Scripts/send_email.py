@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 import os
 
 # Define your API key and endpoint
-api_key = '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'
+api_key = 'apikey'
 endpoint = 'https://api.brevo.com/v3/smtp/email'
 
 # Define the email details
